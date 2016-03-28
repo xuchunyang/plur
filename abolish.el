@@ -36,7 +36,7 @@
               (tail (substring string (match-end 0))))
           (mapcar (lambda (variety)
                     (concat head variety tail))
-                  (split-string body "[ ]*,[ ]*")))
+                  (split-string body ",")))
       (list string))))
 
 ;;;###autoload
