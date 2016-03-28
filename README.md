@@ -2,7 +2,7 @@
 
 `abolish.el` allows you replace several variations of a word at once.
 
-`abolish.el` is an Emacs port of[abolish.vim](https://github.com/tpope/vim-abolish).
+`abolish.el` is an Emacs port of [abolish.vim](https://github.com/tpope/vim-abolish).
 
 ## Replace
 
