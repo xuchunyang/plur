@@ -29,6 +29,7 @@
 (require 'cl-lib)
 
 (defun abolish-split-string (s)
+  ;; "m{ice,ouse}" => ("m" ("ice,ouse"))
   (let ((start 0) strings aux)
     (while (string-match "{\\([^{}]*\\)}" s start)
       (let ((prefix (substring s start (match-beginning 0))))
@@ -81,7 +82,6 @@
       (setq aux nil)
       (dolist (elt1 elt)                ; String
         (dolist (prefix results)        ; String
-          (message "=> %s" (concat prefix elt1))
           (push (concat prefix elt1) aux)))
       (setq results (nreverse aux)))))
 
