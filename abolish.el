@@ -36,7 +36,9 @@
           (push prefix strings)))
       (push (list (match-string 1 s)) strings)
       (setq start (match-end 0)))
-    (or (nreverse strings) (list s))))
+    (when (/=  start (- (length s) 1))
+      (push (substring s start) strings ))
+    (nreverse strings)))
 
 (defun abolish-build-rx-form (strings)
   (let ((form '(and)))
