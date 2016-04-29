@@ -28,40 +28,38 @@
 
 (require 'cl-lib)
 
-(defun abolish-split (string)
-  (save-match-data
-    (if (string-match "{\\(.*?\\)}" string)
-        (let ((head (substring string 0 (match-beginning 0)))
-              (body (match-string 1 string))
-              (tail (substring string (match-end 0))))
-          (mapcar (lambda (variety)
-                    (concat head variety tail))
-                  (split-string body ",")))
-      (list string))))
+(defun abolish-split-string (s)
+  (let ((start 0) strings aux)
+    (while (string-match "{\\([^{}]*\\)}" s start)
+      (let ((prefix (substring s start (match-beginning 0))))
+        (unless (string= "" prefix)
+          (push prefix strings)))
+      (push (list (match-string 1 s)) strings)
+      (setq start (match-end 0)))
+    (or (nreverse strings) (list s))))
 
-;;;###autoload
-(defun abolish-replace (from-string to-string)
-  (interactive
-   (let* ((from (read-from-minibuffer "Replace string: "))
-          (to (read-from-minibuffer (format "Replace string %s with: " from))))
-     (list from to)))
-  (let* ((search (abolish-split from-string))
-         (replace (abolish-split to-string))
-         (s-r
-          (cl-mapcar
-           #'cons
-           search
-           ;; Make sure `search' and `replace' contain the same number of elements
-           (if (= (length search) (length replace))
-               replace
-             (make-list (length search) (car replace)))))
-         (replace-count 0))
-    (while (re-search-forward (regexp-opt search) nil t)
-      (let* ((match (downcase (match-string 0)))
-             (replace (cdr (assoc match s-r))))
-        (replace-match replace)
-        (setq replace-count (+ 1 replace-count))))
-    (message "Replaced %d occurrence(s)" replace-count)))
+(defun abolish-build-rx-form (strings)
+  (let ((form '(and)))
+    (dolist (item strings form)
+      (setq form
+            (append form (if (stringp item)
+                             (list item)
+                           (list (append '(or) (split-string (car item) ",")))))))))
+
+(defun abolish-isearch-search-func ()
+  "Return a function to use for the search."
+  (lambda (string &optional bound noerror count)
+    (let ((s (rx-to-string
+              (abolish-build-rx-form
+               (abolish-split-string string)))))
+      (condition-case err
+          (funcall
+           (if isearch-forward #'re-search-forward #'re-search-backward)
+           s
+           bound noerror count)
+        (search-failed nil)))))
+
+(setq isearch-search-fun-function 'abolish-isearch-search-func)
 
 (provide 'abolish)
 ;;; abolish.el ends here
