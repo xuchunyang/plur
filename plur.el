@@ -1,9 +1,9 @@
-;;; abolish.el --- Emacs Port of abolish.vim  -*- lexical-binding: t; -*-
+;;; plur.el --- Emacs Port of abolish.vim  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2016  Chunyang Xu
 
 ;; Author: Chunyang Xu <xuchunyang56@gmail.com>
-;; URL: https://github.com/xuchunyang/emacs-abolish
+;; URL: https://github.com/xuchunyang/plur
 ;; Version: 0.01
 ;; Package-Requires: ((cl-lib "0.5"))
 
@@ -22,13 +22,14 @@
 
 ;;; Commentary:
 
-;;
+;; TODO Write documentation
+;; TODO Write test
 
 ;;; Code:
 
 (require 'cl-lib)
 
-(defun abolish-split-string (s)
+(defun plur-split-string (s)
   ;; "m{ice,ouse}" => ("m" ("ice,ouse"))
   (let ((start 0) strings aux)
     (while (string-match "{\\([^{}]*\\)}" s start)
@@ -41,7 +42,7 @@
       (push (substring s start) strings ))
     (nreverse strings)))
 
-(defun abolish-build-rx-form (strings)
+(defun plur-build-rx-form (strings)
   (let ((form '(and)))
     (dolist (item strings form)
       (setq form
@@ -49,12 +50,12 @@
                              (list item)
                            (list (append '(or) (split-string (car item) ",")))))))))
 
-(defun abolish-isearch-search-func ()
+(defun plur-isearch-search-func ()
   "Return a function to use for the search."
   (lambda (string &optional bound noerror count)
     (let ((s (rx-to-string
-              (abolish-build-rx-form
-               (abolish-split-string string)))))
+              (plur-build-rx-form
+               (plur-split-string string)))))
       (condition-case err
           (funcall
            (if isearch-forward #'re-search-forward #'re-search-backward)
@@ -62,9 +63,9 @@
            bound noerror count)
         (search-failed nil)))))
 
-(setq isearch-search-fun-function 'abolish-isearch-search-func)
+(setq isearch-search-fun-function 'plur-isearch-search-func)
 
-(defun abolish-normalize-strings (strings)
+(defun plur-normalize-strings (strings)
   ;; ("m" ("ice,ouse") => (("m") ("ice" "ouse"))
   (let (result)
     (dolist (elt strings)
@@ -73,10 +74,10 @@
         (push (split-string (car elt) ",") result)))
     (nreverse result)))
 
-(defun abolish-expand-string (string)
+(defun plur-expand-string (string)
   ;; facilit{y,ies} => ("facility" "facilities")
-  (let ((strings (abolish-normalize-strings
-                  (abolish-split-string string)))
+  (let ((strings (plur-normalize-strings
+                  (plur-split-string string)))
         (results '("")) aux)
     (dolist (elt strings results)       ; List
       (setq aux nil)
@@ -85,7 +86,7 @@
           (push (concat prefix elt1) aux)))
       (setq results (nreverse aux)))))
 
-(defun abolish-query-replace (from-string to-string &optional delimited start end backward region-noncontiguous-p)
+(defun plur-query-replace (from-string to-string &optional delimited start end backward region-noncontiguous-p)
   (interactive
    (let ((common
           (query-replace-read-args
@@ -105,16 +106,16 @@
            (if (use-region-p) (region-noncontiguous-p)))))
   (let ((matches
          (cl-mapcar 'cons
-                    (abolish-expand-string from-string)
-                    (abolish-expand-string to-string))))
+                    (plur-expand-string from-string)
+                    (plur-expand-string to-string))))
     (setq to-string (cons (lambda (_data _count)
                             (cdr (assoc (match-string 0) matches)))
                           nil)))
   (setq from-string (rx-to-string
-                     (abolish-build-rx-form
-                      (abolish-split-string from-string))))
+                     (plur-build-rx-form
+                      (plur-split-string from-string))))
   (perform-replace from-string to-string t t delimited nil nil start end backward region-noncontiguous-p))
 
 
-(provide 'abolish)
-;;; abolish.el ends here
+(provide 'plur)
+;;; plur.el ends here
