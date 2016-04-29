@@ -63,5 +63,58 @@
 
 (setq isearch-search-fun-function 'abolish-isearch-search-func)
 
+(defun abolish-normalize-strings (strings)
+  ;; ("m" ("ice,ouse") => (("m") ("ice" "ouse"))
+  (let (result)
+    (dolist (elt strings)
+      (if (stringp elt)
+          (push (list elt) result)
+        (push (split-string (car elt) ",") result)))
+    (nreverse result)))
+
+(defun abolish-expand-string (string)
+  ;; facilit{y,ies} => ("facility" "facilities")
+  (let ((strings (abolish-normalize-strings
+                  (abolish-split-string string)))
+        (results '("")) aux)
+    (dolist (elt strings results)       ; List
+      (setq aux nil)
+      (dolist (elt1 elt)                ; String
+        (dolist (prefix results)        ; String
+          (message "=> %s" (concat prefix elt1))
+          (push (concat prefix elt1) aux)))
+      (setq results (nreverse aux)))))
+
+(defun abolish-query-replace (from-string to-string &optional delimited start end backward region-noncontiguous-p)
+  (interactive
+   (let ((common
+          (query-replace-read-args
+           (concat "Query replace"
+                   (if current-prefix-arg
+                       (if (eq current-prefix-arg '-) " backward" " word")
+                     "")
+                   (if (use-region-p) " in region" ""))
+           nil)))
+     (list (nth 0 common) (nth 1 common) (nth 2 common)
+           ;; These are done separately here
+           ;; so that command-history will record these expressions
+           ;; rather than the values they had this time.
+           (if (use-region-p) (region-beginning))
+           (if (use-region-p) (region-end))
+           (nth 3 common)
+           (if (use-region-p) (region-noncontiguous-p)))))
+  (let ((matches
+         (cl-mapcar 'cons
+                    (abolish-expand-string from-string)
+                    (abolish-expand-string to-string))))
+    (setq to-string (cons (lambda (_data _count)
+                            (cdr (assoc (match-string 0) matches)))
+                          nil)))
+  (setq from-string (rx-to-string
+                     (abolish-build-rx-form
+                      (abolish-split-string from-string))))
+  (perform-replace from-string to-string t t delimited nil nil start end backward region-noncontiguous-p))
+
+
 (provide 'abolish)
 ;;; abolish.el ends here
