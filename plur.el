@@ -86,7 +86,8 @@
           (push (concat prefix elt1) aux)))
       (setq results (nreverse aux)))))
 
-(defun plur-query-replace (from-string to-string &optional delimited start end backward region-noncontiguous-p)
+(defun plur-query-replace (from-string to-string &optional delimited start end backward)
+  "Adapt from `query-replace'."
   (interactive
    (let ((common
           (query-replace-read-args
@@ -102,8 +103,7 @@
            ;; rather than the values they had this time.
            (if (use-region-p) (region-beginning))
            (if (use-region-p) (region-end))
-           (nth 3 common)
-           (if (use-region-p) (region-noncontiguous-p)))))
+           (nth 3 common))))
   (let ((matches
          (cl-mapcar 'cons
                     (plur-expand-string from-string)
@@ -114,7 +114,7 @@
   (setq from-string (rx-to-string
                      (plur-build-rx-form
                       (plur-split-string from-string))))
-  (perform-replace from-string to-string t t delimited nil nil start end backward region-noncontiguous-p))
+  (perform-replace from-string to-string t t delimited nil nil start end backward))
 
 
 (provide 'plur)
