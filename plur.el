@@ -31,7 +31,7 @@
 
 (defun plur-split-string (s)
   ;; "m{ice,ouse}" => ("m" ("ice,ouse"))
-  (let ((start 0) strings aux)
+  (let ((start 0) strings)
     (while (string-match "{\\([^{}]*\\)}" s start)
       (let ((prefix (substring s start (match-beginning 0))))
         (unless (string= "" prefix)
@@ -56,7 +56,7 @@
     (let ((s (rx-to-string
               (plur-build-rx-form
                (plur-split-string string)))))
-      (condition-case err
+      (condition-case nil
           (funcall
            (if isearch-forward #'re-search-forward #'re-search-backward)
            s
