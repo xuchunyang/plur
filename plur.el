@@ -121,6 +121,7 @@
           (push (concat prefix elt1) aux)))
       (setq results (nreverse aux)))))
 
+;;;###autoload
 (defun plur-query-replace (from-string to-string &optional delimited start end backward)
   "Adapt from `query-replace'."
   (interactive
