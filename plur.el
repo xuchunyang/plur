@@ -63,7 +63,13 @@
            bound noerror count)
         (search-failed nil)))))
 
-(setq isearch-search-fun-function 'plur-isearch-search-func)
+;;;###autoload
+(define-minor-mode plur-isearch-mode
+  "Inject plur into isearch."
+  :global t
+  (if plur-isearch-mode
+      (setq isearch-search-fun-function 'plur-isearch-search-func)
+    (setq isearch-search-fun-function 'isearch-search-fun-default)))
 
 (defun plur-normalize-strings (strings)
   ;; ("m" ("ice,ouse") => (("m") ("ice" "ouse"))
