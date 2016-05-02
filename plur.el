@@ -57,7 +57,7 @@
 ;; To search "mouse" and "mice" using:
 ;;
 ;; #+BEGIN_SRC undefined
-;; M-x plur-isearch-forward RET m{ouse,ice} RET
+;; M-x plur-isearch-forward RET m{ouse,ice}
 ;; #+END_SRC
 ;;
 ;; ** Acknowledge
