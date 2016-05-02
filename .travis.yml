@@ -11,9 +11,9 @@ before_install:
   - git clone https://github.com/rejeep/evm.git /home/travis/.evm
   - export PATH="/home/travis/.evm/bin:$PATH"
   - evm config path /tmp
-  - evm install $EVM_EMACS
+  - evm install --use $EVM_EMACS
 
 script:
-  - $EVM_EMACS --version
-  - $EVM_EMACS --batch --funcall batch-byte-compile plur.el
-  - $EVM_EMACS -Q --batch -L . --load ert --load plur-test --funcall ert-run-tests-batch-and-exit
+  - emacs --version
+  - emacs --batch --funcall batch-byte-compile plur.el
+  - emacs --batch -L . --load ert --load plur-test --funcall ert-run-tests-batch-and-exit
