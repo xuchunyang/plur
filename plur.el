@@ -137,7 +137,6 @@
 
 ;;;###autoload
 (defun plur-query-replace (from-string to-string &optional delimited start end backward)
-  "Adapt from `query-replace'."
   (interactive
    (let ((common
           (query-replace-read-args
@@ -148,9 +147,6 @@
                    (if (use-region-p) " in region" ""))
            nil)))
      (list (nth 0 common) (nth 1 common) (nth 2 common)
-           ;; These are done separately here
-           ;; so that command-history will record these expressions
-           ;; rather than the values they had this time.
            (if (use-region-p) (region-beginning))
            (if (use-region-p) (region-end))
            (nth 3 common))))
