@@ -38,6 +38,10 @@ To search "mouse" and "mice" using:
   M-x plur-isearch-forward RET m{ouse,ice}
 #+END_SRC
 
+** Requirements
+
+- Emacs 24.4 or higher
+
 ** Acknowledge
 
 This package is inspired by [[https://github.com/tpope/vim-abolish][vim-abolish]].
