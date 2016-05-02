@@ -122,6 +122,19 @@
           (push (concat prefix elt1) aux)))
       (setq results (nreverse aux)))))
 
+(defun plur-replace-subr (from-string to-string)
+  "Return a list contains search and replacement for `perform-replace'."
+  (let ((matches (cl-mapcar 'cons
+                            (plur-expand-string from-string)
+                            (plur-expand-string to-string))))
+    (setq to-string (cons (lambda (_data _count)
+                            (cdr (assoc (match-string 0) matches)))
+                          nil)))
+  (setq from-string (rx-to-string
+                     (plur-build-rx-form
+                      (plur-split-string from-string))))
+  (list from-string to-string))
+
 ;;;###autoload
 (defun plur-query-replace (from-string to-string &optional delimited start end backward)
   "Adapt from `query-replace'."
@@ -141,17 +154,8 @@
            (if (use-region-p) (region-beginning))
            (if (use-region-p) (region-end))
            (nth 3 common))))
-  (let ((matches
-         (cl-mapcar 'cons
-                    (plur-expand-string from-string)
-                    (plur-expand-string to-string))))
-    (setq to-string (cons (lambda (_data _count)
-                            (cdr (assoc (match-string 0) matches)))
-                          nil)))
-  (setq from-string (rx-to-string
-                     (plur-build-rx-form
-                      (plur-split-string from-string))))
-  (perform-replace from-string to-string t t delimited nil nil start end backward))
+  (cl-destructuring-bind (from-string to-string) (plur-replace-subr from-string to-string)
+    (perform-replace from-string to-string t t delimited nil nil start end backward)))
 
 ;;;###autoload
 (defun plur-replace (from-string to-string &optional delimited start end backward)
@@ -168,17 +172,8 @@
            (if (use-region-p) (region-beginning))
            (if (use-region-p) (region-end))
            (nth 3 common))))
-  (let ((matches
-         (cl-mapcar 'cons
-                    (plur-expand-string from-string)
-                    (plur-expand-string to-string))))
-    (setq to-string (cons (lambda (_data _count)
-                            (cdr (assoc (match-string 0) matches)))
-                          nil)))
-  (setq from-string (rx-to-string
-                     (plur-build-rx-form
-                      (plur-split-string from-string))))
-  (perform-replace from-string to-string nil t delimited nil nil start end backward))
+  (cl-destructuring-bind (from-string to-string) (plur-replace-subr from-string to-string)
+    (perform-replace from-string to-string nil t delimited nil nil start end backward)))
 
 
 (provide 'plur)
