@@ -1,4 +1,4 @@
-** plur
+* plur
 [[https://travis-ci.org/xuchunyang/plur][file:https://travis-ci.org/xuchunyang/plur.svg?branch=master]]
 
 This package introduces a new syntax =...{subexp1,subexp2,...}...= to search and replace a
