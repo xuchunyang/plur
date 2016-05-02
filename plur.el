@@ -122,14 +122,56 @@
           (push (concat prefix elt1) aux)))
       (setq results (nreverse aux)))))
 
+(defun plur-string-all-upper-case-p (string)
+  (string= string (upcase string)))
+
+(defun plur-string-all-lower-case-p (string)
+  (string= string (downcase string)))
+
+(defun plur-string-capitalized-p (string)
+  "Return non-nil if the first letter of STRING is upper case."
+  (plur-string-all-upper-case-p (substring string 0 1)))
+
+(defun plur-string-preserve-upper-case (s1 s2)
+  "Preserve upper case in S1 and S2.
+S1 and S1 are same string but in different case.
+For example, \"Foobar\", \"fooBar\" => \"FooBar\"."
+  (apply 'string
+         (cl-mapcar (lambda (c1 c2)
+                      (if (and (= (downcase c1) c1)
+                               (= (downcase c1) c2))
+                          c1
+                        (upcase c1)))
+                    s1 s2)))
+
+(defun plur-replace-find-match (matches from-string)
+  "Return a function as the cdr of replacement for `perform-replace'."
+  (lambda (_data _count)
+    ;; Simulate `case-replace' to preserve case in replacement
+    ;; See (info "(emacs) Replacement and Lax Matches")
+    (let* ((search (match-string 0))
+           (replacement
+            (cdr (assoc (downcase search) matches))))
+      (if (or (not (plur-string-all-lower-case-p from-string)) ; if search contains any
+              case-replace                                     ; upper-case letter,
+              case-fold-search)                                ; don't change case
+          replacement
+        (plur-string-preserve-upper-case
+         (cond
+          ((plur-string-all-lower-case-p search) (downcase replacement))
+          ((plur-string-all-upper-case-p search) (upcase replacement))
+          ((plur-string-capitalized-p search) (capitalize replacement))
+          (t replacement))
+         replacement)))))
+
 (defun plur-replace-subr (from-string to-string)
   "Return a list contains search and replacement for `perform-replace'."
-  (let ((matches (cl-mapcar 'cons
-                            (plur-expand-string from-string)
-                            (plur-expand-string to-string))))
-    (setq to-string (cons (lambda (_data _count)
-                            (cdr (assoc (match-string 0) matches)))
-                          nil)))
+  (let ((matches
+         (cl-mapcar 'cons
+                    (mapcar 'downcase (plur-expand-string from-string))
+                    (plur-expand-string to-string))))
+    (setq to-string
+          (cons (plur-replace-find-match matches from-string) nil)))
   (setq from-string (rx-to-string
                      (plur-build-rx-form
                       (plur-split-string from-string))))
