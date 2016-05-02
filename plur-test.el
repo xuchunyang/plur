@@ -6,7 +6,13 @@
   (should (equal (plur-split-string "pre-")              '("pre-")))
   (should (equal (plur-split-string "{AAA,BBB}")         '(("AAA,BBB"))))
   (should (equal (plur-split-string "pre-{AAA,BBB}")     '("pre-" ("AAA,BBB"))))
-  (should (equal (plur-split-string "pre-{AAA,BBB}-ing") '("pre-" ("AAA,BBB") "-ing"))))
+  (should (equal (plur-split-string "pre-{AAA,BBB}-ing") '("pre-" ("AAA,BBB") "-ing")))
+  (should (equal (plur-split-string "beg-{A,B}-mid-{C,D}-end") '("beg-" ("A,B") "-mid-" ("C,D") "-end"))))
+
+(ert-deftest plur-build-regexp-test ()
+  (should (string= (plur-build-regexp "child{,ren}") (rx (and "child" (or "" "ren")))))
+  (should (string= (plur-build-regexp "beg-{A,B}-mid-{C,D}-end") (rx (and "beg-" (or "A" "B") "-mid-" (or "C" "D") "-end"))))
+  (should (string= (plur-build-regexp "{emacs,vim}") (rx (or "emacs" "vim")))))
 
 (ert-deftest plur-replace-test ()
   (cl-flet ((do-replace (text from-string to-string)

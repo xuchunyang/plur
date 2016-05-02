@@ -94,10 +94,13 @@
                              (list item)
                            (list (append '(or) (split-string (car item) ",")))))))))
 
-(defun plur-isearch-regexp (string &optional _lax)
+(defun plur-build-regexp (string)
   (rx-to-string
    (plur-build-rx-form
-    (plur-split-string string))))
+    (plur-split-string string)) 'no-group))
+
+(defun plur-isearch-regexp (string &optional _lax)
+  (plur-build-regexp string))
 
 (put 'plur-isearch-regexp 'isearch-message-prefix "plur ")
 
@@ -177,9 +180,7 @@ For example, \"Foobar\", \"fooBar\" => \"FooBar\"."
                     (plur-expand-string to-string))))
     (setq to-string
           (cons (plur-replace-find-match matches from-string) nil)))
-  (setq from-string (rx-to-string
-                     (plur-build-rx-form
-                      (plur-split-string from-string))))
+  (setq from-string (plur-build-regexp from-string))
   (list from-string to-string))
 
 ;;;###autoload
