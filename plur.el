@@ -80,26 +80,17 @@
                              (list item)
                            (list (append '(or) (split-string (car item) ",")))))))))
 
-(defun plur-isearch-search-func ()
-  "Return a function to use for the search."
-  (lambda (string &optional bound noerror count)
-    (let ((s (rx-to-string
-              (plur-build-rx-form
-               (plur-split-string string)))))
-      (condition-case nil
-          (funcall
-           (if isearch-forward #'re-search-forward #'re-search-backward)
-           s
-           bound noerror count)
-        (search-failed nil)))))
+(defun plur-isearch-regexp (string &optional _lax)
+  (rx-to-string
+   (plur-build-rx-form
+    (plur-split-string string))))
+
+(put 'plur-isearch-regexp 'isearch-message-prefix "plur ")
 
 ;;;###autoload
-(define-minor-mode plur-isearch-mode
-  "Inject plur into isearch."
-  :global t
-  (if plur-isearch-mode
-      (setq isearch-search-fun-function 'plur-isearch-search-func)
-    (setq isearch-search-fun-function 'isearch-search-fun-default)))
+(defun plur-isearch-forward (&optional _not-plur no-recursive-edit)
+  (interactive "P\np")
+  (isearch-mode t nil nil (not no-recursive-edit) 'plur-isearch-regexp))
 
 (defun plur-normalize-strings (strings)
   ;; ("m" ("ice,ouse") => (("m") ("ice" "ouse"))
