@@ -127,7 +127,7 @@
   (interactive
    (let ((common
           (query-replace-read-args
-           (concat "Query replace"
+           (concat "Plur Query replace"
                    (if current-prefix-arg
                        (if (eq current-prefix-arg '-) " backward" " word")
                      "")
@@ -151,6 +151,33 @@
                      (plur-build-rx-form
                       (plur-split-string from-string))))
   (perform-replace from-string to-string t t delimited nil nil start end backward))
+
+;;;###autoload
+(defun plur-replace (from-string to-string &optional delimited start end backward)
+  (interactive
+   (let ((common
+          (query-replace-read-args
+           (concat "Plur Replace"
+                   (if current-prefix-arg
+                       (if (eq current-prefix-arg '-) " backward" " word")
+                     "")
+                   (if (use-region-p) " in region" ""))
+           t)))
+     (list (nth 0 common) (nth 1 common) (nth 2 common)
+           (if (use-region-p) (region-beginning))
+           (if (use-region-p) (region-end))
+           (nth 3 common))))
+  (let ((matches
+         (cl-mapcar 'cons
+                    (plur-expand-string from-string)
+                    (plur-expand-string to-string))))
+    (setq to-string (cons (lambda (_data _count)
+                            (cdr (assoc (match-string 0) matches)))
+                          nil)))
+  (setq from-string (rx-to-string
+                     (plur-build-rx-form
+                      (plur-split-string from-string))))
+  (perform-replace from-string to-string nil t delimited nil nil start end backward))
 
 
 (provide 'plur)
