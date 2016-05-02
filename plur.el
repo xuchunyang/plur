@@ -67,8 +67,9 @@
           (push prefix strings)))
       (push (list (match-string 1 s)) strings)
       (setq start (match-end 0)))
-    (when (/=  start (- (length s) 1))
-      (push (substring s start) strings ))
+    (let ((tail (substring s start)))
+      (unless (string= "" tail)
+        (push tail strings)))
     (nreverse strings)))
 
 (defun plur-build-rx-form (strings)
