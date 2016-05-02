@@ -21,7 +21,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;; ** About
+;; ** plur
 
 ;; This package introduces a new syntax =...{subexp1,subexp2,...}...= to search and
 ;; replace a group of words.  Three commands are provided by this package:
