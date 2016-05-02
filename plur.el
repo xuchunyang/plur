@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2016  Chunyang Xu
 
-;; Author: Chunyang Xu <xuchunyang56@gmail.com>
+;; Author: Chunyang Xu <xuchunyang.me@gmail.com>
 ;; URL: https://github.com/xuchunyang/plur
 ;; Version: 0.01
 ;; Package-Requires: ((cl-lib "0.5"))
