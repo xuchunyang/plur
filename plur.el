@@ -21,37 +21,47 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;; ** Usage
+;; ** About
 
+;; This package introduces a new syntax =...{subexp1,subexp2,...}...= to search and
+;; replace a group of words.  Three commands are provided by this package:
+;;
+;; - ~plur-isearch-forward~
+;; - ~plur-query-replace~
+;; - ~plur-replace~
+;;
+;; ** Replace example
+;;
 ;; To replace "mouse" with "cat" and "mice" with "cats" using:
-
+;;
 ;; #+BEGIN_SRC undefined
 ;; M-x plur-query-replace RET m{ouse,ice} RET cat{,s} RET
 ;; #+END_SRC
-
+;;
 ;; For more examples,
-
+;;
 ;; - Facility to Building
-
+;;
 ;; facilit{y,ies}  building{,s}
-
+;;
 ;; - Mouse to Trackpad
-
+;;
 ;; m{ouse,ice}  trackpad{,s}
-
+;;
 ;; - Swap Emacs and Vim
-
+;;
 ;; {emacs,vim}  {vim,emacs}
-
+;;
+;; ** Search example
+;;
 ;; To search "mouse" and "mice" using:
-
+;;
 ;; #+BEGIN_SRC undefined
-;; M-x plur-isearch-mode RET
-;; C-s m{ouse,ice}
+;; M-x plur-isearch-forward RET m{ouse,ice} RET
 ;; #+END_SRC
-
+;;
 ;; ** Acknowledge
-
+;;
 ;; This package is inspired by [[https://github.com/tpope/vim-abolish][vim-abolish]].
 
 ;;; Code:
