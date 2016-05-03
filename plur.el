@@ -1,4 +1,4 @@
-;;; plur.el --- Easily (I hope) search and replace multiple variants of a word  -*- lexical-binding: t; -*-
+;;; plur.el --- Easily search and replace multiple variants of a word  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2016  Chunyang Xu
 
