@@ -21,7 +21,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;; * plur
+;; * Plur
 
 ;; This package introduces a new syntax =...{subexp1,subexp2,...}...= to search and
 ;; replace a group of words.  Three commands are provided by this package:
@@ -63,6 +63,28 @@
 ;; ** Requirements
 ;;
 ;; - Emacs 24.4 or higher
+;;
+;; ** Installation
+;;
+;; *** MELPA
+;;
+;; Plur is available from [[https://melpa.org][Melpa]]. You can install it using:
+;;
+;; #+BEGIN_SRC undefined
+;; M-x package-install RET plur RET
+;; #+END_SRC
+;;
+;; *** Manually
+;;
+;; Make sure plur.el is saved in a directory in you ~load-path~ and load it. Add something
+;; like
+;;
+;; #+BEGIN_SRC emacs-lisp
+;; (add-to-list 'load-path "path/to/plur/")
+;; (require 'plur)
+;; #+END_SRC
+;;
+;; to your init file.
 ;;
 ;; ** Acknowledge
 ;;
