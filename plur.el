@@ -126,10 +126,66 @@
 
 (put 'plur-isearch-regexp 'isearch-message-prefix "plur ")
 
+(defvar plur-isearch-query-replace-key "\M-%"
+  "Default binding of `plur-isearch-query-replace'.")
+(defvar plur-isearch-query-replace-orig-cmd nil)
+
+(defun plur-isearch-mode-hook ()
+  (setq plur-isearch-query-replace-orig-cmd
+        (lookup-key isearch-mode-map plur-isearch-query-replace-key))
+  (define-key isearch-mode-map
+    plur-isearch-query-replace-key 'plur-isearch-query-replace))
+
+(defun plur-isearch-mode-end-hook ()
+  (define-key isearch-mode-map
+    plur-isearch-query-replace-key plur-isearch-query-replace-orig-cmd)
+  (remove-hook 'isearch-mode-hook 'plur-isearch-mode-hook)
+  (remove-hook 'isearch-mode-end-hook 'plur-isearch-mode-end-hook))
+
 ;;;###autoload
 (defun plur-isearch-forward (&optional _not-plur no-recursive-edit)
   (interactive "P\np")
+  (add-hook 'isearch-mode-hook 'plur-isearch-mode-hook)
+  (add-hook 'isearch-mode-end-hook 'plur-isearch-mode-end-hook)
   (isearch-mode t nil nil (not no-recursive-edit) 'plur-isearch-regexp))
+
+(defun plur-isearch-query-replace (&optional arg)
+  "Start `plur-query-replace' from `plur-isearch-forward'."
+  (interactive
+   (list current-prefix-arg))
+  (barf-if-buffer-read-only)
+  (let ((search-upper-case nil)
+        (search-invisible isearch-invisible)
+        (backward (and arg (eq arg '-)))
+        (isearch-recursive-edit nil)
+        (from-string isearch-string)
+        to-string)
+    (isearch-done nil t)
+    (isearch-clean-overlays)
+    (if (and isearch-other-end
+             (if backward
+                 (> isearch-other-end (point))
+               (< isearch-other-end (point)))
+             (not (and transient-mark-mode mark-active
+                       (if backward
+                           (> (mark) (point))
+                         (< (mark) (point))))))
+        (goto-char isearch-other-end))
+    (set query-replace-from-history-variable
+         (cons isearch-string
+               (symbol-value query-replace-from-history-variable)))
+    (setq to-string
+          (query-replace-read-to
+           from-string
+           (concat "Query replace"
+                   (isearch--describe-regexp-mode isearch-regexp-function t)
+                   (if (and transient-mark-mode mark-active) " in region" ""))
+           t))
+    (cl-destructuring-bind (from-string to-string) (plur-replace-subr from-string to-string)
+      (perform-replace from-string to-string t t nil nil nil
+                       (if (and transient-mark-mode mark-active) (region-beginning))
+                       (if (and transient-mark-mode mark-active) (region-end))))
+    (and isearch-recursive-edit (exit-recursive-edit))))
 
 (defun plur-normalize-strings (strings)
   ;; ("m" ("ice,ouse") => (("m") ("ice" "ouse"))
