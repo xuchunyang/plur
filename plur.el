@@ -126,29 +126,14 @@
 
 (put 'plur-isearch-regexp 'isearch-message-prefix "plur ")
 
-(defvar plur-isearch-query-replace-key "\M-%"
-  "Default binding of `plur-isearch-query-replace'.")
-(defvar plur-isearch-query-replace-orig-cmd nil)
-
-(defun plur-isearch-mode-hook ()
-  (setq plur-isearch-query-replace-orig-cmd
-        (lookup-key isearch-mode-map plur-isearch-query-replace-key))
-  (define-key isearch-mode-map
-    plur-isearch-query-replace-key 'plur-isearch-query-replace))
-
-(defun plur-isearch-mode-end-hook ()
-  (define-key isearch-mode-map
-    plur-isearch-query-replace-key plur-isearch-query-replace-orig-cmd)
-  (remove-hook 'isearch-mode-hook 'plur-isearch-mode-hook)
-  (remove-hook 'isearch-mode-end-hook 'plur-isearch-mode-end-hook))
-
 ;;;###autoload
 (defun plur-isearch-forward (&optional _not-plur no-recursive-edit)
   (interactive "P\np")
-  (add-hook 'isearch-mode-hook 'plur-isearch-mode-hook)
-  (add-hook 'isearch-mode-end-hook 'plur-isearch-mode-end-hook)
   (isearch-mode t nil nil (not no-recursive-edit) 'plur-isearch-regexp))
 
+;; This autoload cookie is just for package.el user who wants bind some key to this
+;; command on `isearch-mode-map' in h{is,er} init file without requiring this feature.
+;;;###autoload
 (defun plur-isearch-query-replace (&optional arg)
   "Start `plur-query-replace' from `plur-isearch-forward'."
   (interactive
